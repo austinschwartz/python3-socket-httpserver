@@ -39,25 +39,27 @@ class RequestHandler(socketserver.BaseRequestHandler):
     def handleHTTP(self, text):
         sp = text.split('\r\n')
         request = sp[0].split(' ')
-        file_path = '/' + request[1]
-        if file_path[0] == '/' and file_path[1] == '/':
-            file_path = file_path[1:]
-        if file_path == '/':
-            file_path = '/index.html'
-        file_path = 'Upload' + file_path
+        filepath = '/' + request[1]
+        if filepath[0] == '/' and filepath[1] == '/':
+            filepath = filepath[1:]
+        if filepath == '/':
+            filepath = '/index.html'
+        filepath = 'Upload' + filepath
         if request[0] == 'GET':
-            my_file = Path(file_path)
-            if my_file.is_file():
-                print("Sending " + file_path)
-                try:
-                    bbb = my_file.read_bytes()
-                    self.sendOK()
-                    self.sendContentType(file_path)
-                    self.sendFile(bbb)
-                except: 
-                    self.sendDenied()
+            myfile = Path(filepath)
+            if myfile.is_file():
+                with open(filepath, 'rb') as f: 
+                    print("Sending " + filepath)
+                    try:
+                        bbb = f.read()
+                        print(bbb)
+                        self.sendOK()
+                        self.sendContentType(filepath)
+                        self.sendFile(bbb)
+                    except: 
+                        self.sendDenied()
             else:
-                print("Sending 404, can't find " + file_path)
+                print("Sending 404, can't find " + filepath)
                 self.sendNF()
         else:
             self.sendNF()

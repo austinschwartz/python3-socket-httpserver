@@ -41,12 +41,15 @@ if __name__ == '__main__':
         print('Downloading ' + file_name + ' to ' + file_path)
         with open(file_path, 'wb') as w:
             sp = b''.join(chunks).split(b'\r\n')
-            file_contents = sp[5]
             try:
-                utf_contents = file_contents.decode('utf8')
-                print("Contents as utf8:")
-                print(utf_contents)
-            except Exception as e:
-                print("Contents as bytes:")
-                print(file_contents)
-            w.write(file_contents)
+                file_contents = sp[5]
+                try:
+                    utf_contents = file_contents.decode('utf8')
+                    print("Contents as utf8:")
+                    print(utf_contents)
+                except Exception as e:
+                    print("Contents as bytes:")
+                    print(file_contents)
+                w.write(file_contents)
+            except:
+                print("403 Permission Denied")
