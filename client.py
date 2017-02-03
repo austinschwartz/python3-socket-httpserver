@@ -6,9 +6,11 @@ import os
 MSGLEN = 1024
 
 if __name__ == '__main__':
-    if len(sys.argv) < 4:
+    if len(sys.argv) < 3:
         print("client.py server_host server_port filename")
         sys.exit()
+    if len(sys.argv) == 3:
+        sys.argv.append('/index.html')
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((sys.argv[1], int(sys.argv[2])))
     s.send(('GET ' + sys.argv[3] + ' HTTP 1/1\r\n').encode())
@@ -23,10 +25,12 @@ if __name__ == '__main__':
             bytes_recd = bytes_recd + len(chunk)
     except Exception as e:
         pass
-    file_name = sys.argv[3]
+    file_name = '/' + sys.argv[3]
+    if file_name[0] == '/' and file_name[1] == '/':
+        file_name = file_name[1:]
     if file_name == '/':
-        file_name = 'index.html'
-    file_path = 'Download/' + file_name
+        file_name = '/index.html'
+    file_path = 'Download' + file_name
     if len(chunks) == 0 or chunks[0] == b'HTTP/1.0 404 Not Found\r\n':
         print("404 File Not Found")
     else:
@@ -38,6 +42,11 @@ if __name__ == '__main__':
         with open(file_path, 'wb') as w:
             sp = b''.join(chunks).split(b'\r\n')
             file_contents = sp[5]
-            print("Contents:")
-            print(file_contents.decode('utf8'))
+            try:
+                utf_contents = file_contents.decode('utf8')
+                print("Contents as utf8:")
+                print(utf_contents)
+            except Exception as e:
+                print("Contents as bytes:")
+                print(file_contents)
             w.write(file_contents)
